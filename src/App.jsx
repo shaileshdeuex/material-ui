@@ -2,10 +2,6 @@ import React from "react";
 import {
   Typography,
   AppBar,
-  Card,
-  CardActions,
-  CardContent,
-  CardMedia,
   CssBaseline,
   Grid,
   Toolbar,
@@ -15,12 +11,25 @@ import {
 import { PhotoCamera } from "@material-ui/icons";
 
 import { useStyles } from "./styles";
+import ModalwithEffect from "./component/ModalwithEffect";
+import CardComponent from "./component/CardComponent";
+import { cards } from "./cardData";
 
-const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 const date = new Date();
 
 function App() {
   const classes = useStyles();
+  const [open, setOpen] = React.useState(false);
+  const [modalImg, setModalImg] = React.useState({});
+
+  const handleOpen = (id) => {
+    setOpen(true);
+    setModalImg(cards[id]);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
   return (
     <>
       <CssBaseline />
@@ -47,9 +56,8 @@ function App() {
               color="textSecondary"
               paragraph
             >
-              Lorem, ipsum dolor sit amet consectetur adipisicing elit.
-              Laboriosam suscipit possimus eos totam debitis dignissimos ipsam
-              ex aspernatur odio facere.
+              Lorem ipsum, dolor sit amet consectetur adipisicing elit. Ratione,
+              reprehenderit animi odit facilis voluptatem minus.
             </Typography>
             <div className={classes.button}>
               <Grid container spacing={2} justify="center">
@@ -69,35 +77,22 @@ function App() {
         </div>
         <Container className={classes.cardGrid} maxWidth="md">
           <Grid container spacing={4}>
-            {cards.map((card) => (
-              <Grid item key={card} xs={12} sm={6} md={4}>
-                <Card className={classes.card}>
-                  <CardMedia
-                    className={classes.cardMedia}
-                    image={`https://source.unsplash.com/collection/${card}`}
-                    title="Image title"
-                  />
-                  <CardContent className={classes.cardContent}>
-                    <Typography variant="h5" gutterBottom>
-                      Heading
-                    </Typography>
-                    <Typography>
-                      Lorem ipsum, dolor sit amet consectetur adipisicing elit.
-                      In, alias?
-                    </Typography>
-                    <CardActions>
-                      <Button size="small" color="primary">
-                        View
-                      </Button>
-                      <Button size="small" color="secondary">
-                        Edit
-                      </Button>
-                    </CardActions>
-                  </CardContent>
-                </Card>
+            {cards.map((card, id) => (
+              <Grid item key={id} xs={12} sm={6} md={4}>
+                <CardComponent
+                  id={id}
+                  handleClick={handleOpen}
+                  buttonAction="View"
+                  {...card}
+                />
               </Grid>
             ))}
           </Grid>
+          <ModalwithEffect
+            open={open}
+            handleClose={handleClose}
+            card={modalImg}
+          />
         </Container>
       </main>
       <footer className={classes.footer}>

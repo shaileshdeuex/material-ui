@@ -39,10 +39,10 @@ export const useStyles = makeStyles((theme) => ({
     border: "2px solid #000",
     boxShadow: theme.shadows[5],
     padding: theme.spacing(2, 4, 3),
-    maxWidth: "600px",
+    width: "600px",
   },
   modalCardAction: {
-    justifyContent: "end",
+    justifyContent: "flex-end",
     marginTop: "10px",
   },
 }));

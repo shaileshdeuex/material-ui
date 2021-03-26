@@ -2,10 +2,6 @@ import React from "react";
 import {
   Typography,
   AppBar,
-  Card,
-  CardActions,
-  CardContent,
-  CardMedia,
   CssBaseline,
   Grid,
   Toolbar,
@@ -15,12 +11,77 @@ import {
 import { PhotoCamera } from "@material-ui/icons";
 
 import { useStyles } from "./styles";
+import ModalwithEffect from "./component/ModalwithEffect";
+import CardComponent from "./component/CardComponent";
+import { cards } from "./cardData";
+import CustomizedInputs from "./component/AddImage";
+import Alert from "@material-ui/lab/Alert";
 
-const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 const date = new Date();
+
+// utility function
+function checkURL(url) {
+  return url.match(/\.(jpeg|jpg|gif|png)$/) != null;
+}
 
 function App() {
   const classes = useStyles();
+  const [cardObj, setSetCardObj] = React.useState(cards);
+  const [open, setOpen] = React.useState(false);
+  const [addCard, setAddCard] = React.useState(false);
+  const [errAlert, setErrAlert] = React.useState({
+    error: false,
+    errMsg: "All fileds are required...!",
+  });
+  const [cardDetail, setcardDetail] = React.useState({});
+  const [imgURL, setImgURL] = React.useState("");
+  const [heading, setHeading] = React.useState("");
+  const [description, setDescription] = React.useState("");
+
+  const handleOpen = (id) => {
+    setOpen(true);
+    setcardDetail(cardObj[id]);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleChange = (event) => {
+    const name = event.target.name;
+    const value = event.target.value;
+    if (name === "imgURL") {
+      setImgURL(value);
+    } else if (name === "heading") {
+      setHeading(value);
+    } else if (name === "description") {
+      setDescription(value);
+    }
+    setErrAlert(false);
+  };
+
+  const handleClick = () => {
+    if (imgURL && heading && description) {
+      if (checkURL(imgURL)) {
+        setSetCardObj([
+          {
+            cardImg: imgURL,
+            cardHeading: heading,
+            cardDetail: description,
+          },
+          ...cardObj,
+        ]);
+        setImgURL("");
+        setHeading("");
+        setDescription("");
+        setAddCard(false);
+      } else {
+        setErrAlert({ error: true, errMsg: "Kindly add valid Image URL...!" });
+      }
+    } else {
+      setErrAlert({ error: true, errMsg: "All fileds are required...!" });
+    }
+  };
   return (
     <>
       <CssBaseline />
@@ -47,15 +108,18 @@ function App() {
               color="textSecondary"
               paragraph
             >
-              Lorem, ipsum dolor sit amet consectetur adipisicing elit.
-              Laboriosam suscipit possimus eos totam debitis dignissimos ipsam
-              ex aspernatur odio facere.
+              Lorem ipsum, dolor sit amet consectetur adipisicing elit. Ratione,
+              reprehenderit animi odit facilis voluptatem minus.
             </Typography>
             <div className={classes.button}>
               <Grid container spacing={2} justify="center">
                 <Grid item>
-                  <Button variant="contained" color="primary">
-                    See My Photo
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => setAddCard(!addCard)}
+                  >
+                    {addCard ? "Close" : "Add Photo"}
                   </Button>
                 </Grid>
                 <Grid item>
@@ -66,38 +130,42 @@ function App() {
               </Grid>
             </div>
           </Container>
+          <Container maxWidth="md">
+            {addCard && (
+              <>
+                <CustomizedInputs
+                  addCard={addCard}
+                  handleChange={handleChange}
+                  imgURL={imgURL}
+                  heading={heading}
+                  description={description}
+                  handleClick={handleClick}
+                />
+                {errAlert.error && (
+                  <Alert severity="error">{errAlert.errMsg}</Alert>
+                )}
+              </>
+            )}
+          </Container>
         </div>
         <Container className={classes.cardGrid} maxWidth="md">
           <Grid container spacing={4}>
-            {cards.map((card) => (
-              <Grid item key={card} xs={12} sm={6} md={4}>
-                <Card className={classes.card}>
-                  <CardMedia
-                    className={classes.cardMedia}
-                    image={`https://source.unsplash.com/collection/${card}`}
-                    title="Image title"
-                  />
-                  <CardContent className={classes.cardContent}>
-                    <Typography variant="h5" gutterBottom>
-                      Heading
-                    </Typography>
-                    <Typography>
-                      Lorem ipsum, dolor sit amet consectetur adipisicing elit.
-                      In, alias?
-                    </Typography>
-                    <CardActions>
-                      <Button size="small" color="primary">
-                        View
-                      </Button>
-                      <Button size="small" color="secondary">
-                        Edit
-                      </Button>
-                    </CardActions>
-                  </CardContent>
-                </Card>
+            {cardObj.map((card, id) => (
+              <Grid item key={id} xs={12} sm={6} md={4}>
+                <CardComponent
+                  id={id}
+                  handleClick={handleOpen}
+                  buttonAction="View"
+                  {...card}
+                />
               </Grid>
             ))}
           </Grid>
+          <ModalwithEffect
+            open={open}
+            handleClose={handleClose}
+            card={cardDetail}
+          />
         </Container>
       </main>
       <footer className={classes.footer}>
